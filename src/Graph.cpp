@@ -1,9 +1,11 @@
 #include "Graph.hpp"
+#include <ctime>
 #include <raymath.h> 
 #include <iostream>
 #include <queue>
 #include <stack> 
-
+#include <chrono>
+#include <thread> 
 Graph::Graph(size_t initial_nodes) : adj() {
 	if (initial_nodes > 0) {
 		adj.reserve(initial_nodes);
@@ -40,19 +42,27 @@ std::unordered_map<int, bool> Graph::DFS(int startNode){
 	std::unordered_map<int, bool> visited; 
 	std::stack<int> q; 
 
-	visited[startNode] = true; 
-	q.push(startNode); 
-	
+	q.push(startNode); 	
 
 	while (!q.empty()) { 
 		int current = q.top(); 
 		q.pop(); 
-		std::cout << current << std::endl; 
+		
+		if (visited.find(current) == visited.end()){
+			visited[current] = true; 
 
-		for (int neighbor : adj[current]){ 
-			if (!visited[neighbor]){ 
-				visited[neighbor] = true; 
-				q.push(neighbor); 
+			std::cout << current << std::endl; 
+
+			if (nodes.count(current)) { 
+				nodes[current].color = ORANGE; 
+			} 
+
+			std::this_thread::sleep_for(std::chrono::milliseconds(500)); 
+
+			for (int neighbor : adj[current]){
+				if (visited.find(neighbor) == visited.end()){
+					q.push(neighbor);
+				}
 			}
 		}
 	}
@@ -68,12 +78,17 @@ std::unordered_map<int, bool>  Graph::BFS(int startNode){
 	while (!q.empty()){ 
 		int current = q.front(); 
 		q.pop(); 
-		std::cout << current << std::endl; 
+		std::cout << current << std::endl;
 
+		if (nodes.count(current)) { 
+			nodes[current].color = GREEN;
+		}
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		for (int neighbor : adj[current]){
 			if (!visited[neighbor]){
 				visited[neighbor] = true; 
-				q.push(neighbor); 
+				q.push(neighbor);
+	
 			} 
 		} 
 	}
@@ -161,11 +176,32 @@ void Graph::draw() {
 
 	for (auto const& [id, prop] : nodes) { 
 		DrawCircleV(prop.position, 22.0f, BLACK); 
-		DrawCircleV(prop.position, 20.0f, MAROON); 
+		DrawCircleV(prop.position, 20.0f, prop.color); 
 
 		std::string label = std::to_string(id); 
 		DrawText(label.c_str(), prop.position.x - 8, prop.position.y - 8, 20, WHITE); 
 	} 
 } 
+
+void Graph::resetColors() { 
+	for (auto& [id, prop] : nodes) { 
+		prop.color = MAROON; 
+	} 
+} 
+
+void Graph::visualBFS(int startNode) {
+	resetColors(); 
+	auto visitedMap = BFS(startNode);
+    for (auto const& [id, _] : visitedMap) {
+        nodes[id].color = GREEN; // Highlight visited nodes
+    }
+}
+
+void Graph::visualDFS(int startNode) {
+    auto visitedMap = DFS(startNode);
+    for (auto const& [id, _] : visitedMap) {
+        nodes[id].color = GREEN; // Highlight visited nodes
+	}
+}
 
 

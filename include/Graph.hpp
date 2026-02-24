@@ -9,6 +9,7 @@ using namespace std;
 struct NodeProperties {
 	Vector2 position; 
 	Vector2 velocity; 
+	Color color = MAROON;
 }; 
 
 class Graph { 
@@ -24,7 +25,10 @@ public:
 	// visualizer 
 	void printGraph(); 
 	void updatePhysics(float deltaTime); 
-	void draw(); 
+	void draw();
+	void visualBFS(int startNode);
+	void visualDFS(int startNode);
+	void resetColors();
 private: 
 	// data member 
 	std::unordered_map<int, std::vector<int>> adj; 
