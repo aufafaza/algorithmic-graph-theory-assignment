@@ -17,8 +17,10 @@ public:
 	Graph(size_t initial_nodes = 0); 
 	void addEdge(int u, int v); 
 	void addVertex(int u); 
-	void BFS(int startNode); 
-	void DFS(int startNode);
+	std::unordered_map<int, bool> BFS(int startNode); 
+	std::unordered_map<int, bool>  DFS(int startNode);
+	bool hasPath(int start, int target); 
+	void component(); 
 	// visualizer 
 	void printGraph(); 
 	void updatePhysics(float deltaTime); 

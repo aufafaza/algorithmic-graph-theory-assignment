@@ -13,7 +13,13 @@ Graph::Graph(size_t initial_nodes) : adj() {
 void Graph::addVertex(int u) { 
 	if (adj.find(u) == adj.end()) { 
 		adj[u] = std::vector<int>();
-	} 
+		
+		float rx = 400 + GetRandomValue(-50, 50);
+		float ry = 300 + GetRandomValue(-50, 50);
+        
+		nodes[u] = { {rx, ry}, {0, 0} };
+	}
+
 } 
 
 void Graph::addEdge(int u, int v){
@@ -30,7 +36,7 @@ void Graph::addEdge(int u, int v){
 	adj[v].push_back(u); 
 }
 
-void Graph::DFS(int startNode){ 
+std::unordered_map<int, bool> Graph::DFS(int startNode){ 
 	std::unordered_map<int, bool> visited; 
 	std::stack<int> q; 
 
@@ -50,8 +56,9 @@ void Graph::DFS(int startNode){
 			}
 		}
 	}
+	return visited;
 } 
-void Graph::BFS(int startNode){ 
+std::unordered_map<int, bool>  Graph::BFS(int startNode){ 
 	std::unordered_map<int, bool> visited; 
 	std::queue<int> q; 
 
@@ -69,10 +76,39 @@ void Graph::BFS(int startNode){
 				q.push(neighbor); 
 			} 
 		} 
-	} 
+	}
+	return visited;
 } 
 
+bool Graph::hasPath(int start, int target) {
+	auto visited = BFS(start); 
+	return visited.count(target) > 0;
+} 
 
+void Graph::component() {
+    std::unordered_map<int, bool> globalVisited;
+    int componentCount = 0;
+    std::vector<int> componentSizes;
+
+    for (auto const& [node, _] : adj) {
+        if (!globalVisited[node]) {
+            componentCount++;
+            auto componentNodes = BFS(node); 
+            componentSizes.push_back(componentNodes.size());
+
+	    for (auto const& [id, _] : componentNodes) {
+		    globalVisited[id] = true; 
+		}
+        }
+    }
+
+    // Output Results
+    std::cout << "Number of components: " << componentCount << std::endl;
+    for (int i = 0; i < componentSizes.size(); i++) {
+        std::cout << "Component " << i + 1 << " size: " << componentSizes[i] << std::endl;
+    }
+    std::cout << "Is Connected: " << (componentCount == 1 ? "Yes" : "No") << std::endl;
+}
 /* Visualizer related code */
 void Graph::updatePhysics(float deltaTime){ 
 	for (auto& [id1, p1] : nodes) { 

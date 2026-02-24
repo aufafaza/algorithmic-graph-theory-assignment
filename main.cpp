@@ -22,7 +22,14 @@ int main(){
 			std::cin >> u;
 			std::cout << "BFS Output:" << std::endl; 
 			g.DFS(u); 
-		} else{
+		} else if (s == 6) {
+		    std::cout << "Enter source and target: ";
+		    std::cin >> u >> v;
+		    if (g.hasPath(u, v)) std::cout << "Path exists!" << std::endl;
+		    else std::cout << "No path found." << std::endl;
+		} else if (s == 7) {
+			    g.component();
+		}else{
 			std::cout << "invalid command\n" << std::endl;
 			break; 
 		} 
