@@ -1,7 +1,7 @@
 #include <iostream> 
 #include "include/Graph.hpp"
-
-int main(){ 
+#include <raylib.h>
+int main(){
 	Graph g; 
 	int s, u, v;
 	while (true){ 
@@ -16,9 +16,11 @@ int main(){
 			g.addVertex(u); 
 		} else if (s == 3){ 
 			std::cin >> u; 
+			std::cout << "BFS Output:" << std::endl; 
 			g.BFS(u); 
 		} else if (s == 4){ 
 			std::cin >> u;
+			std::cout << "BFS Output:" << std::endl; 
 			g.DFS(u); 
 		} else{
 			std::cout << "invalid command\n" << std::endl;

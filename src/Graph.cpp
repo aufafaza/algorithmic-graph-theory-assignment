@@ -1,4 +1,5 @@
 #include "Graph.hpp"
+#include <raymath.h> 
 #include <iostream>
 #include <queue>
 #include <stack> 
@@ -50,7 +51,6 @@ void Graph::DFS(int startNode){
 		}
 	}
 } 
-
 void Graph::BFS(int startNode){ 
 	std::unordered_map<int, bool> visited; 
 	std::queue<int> q; 
@@ -71,4 +71,65 @@ void Graph::BFS(int startNode){
 		} 
 	} 
 } 
+
+
+/* Visualizer related code */
+void Graph::updatePhysics(float deltaTime){ 
+	for (auto& [id1, p1] : nodes) { 
+		Vector2 totalForce = {0, 0}; 
+		for (auto& [id2, p2] : nodes) {
+			if (id1==id2) continue; 
+
+			Vector2 dir = Vector2Subtract(p1.position, p2.position);
+			float distSq = Vector2LengthSqr(dir) + 0.1f; 
+			float force = repulsionStrength / distSq; 
+			totalForce = Vector2Add(totalForce, Vector2Scale(Vector2Normalize(dir), force)); 
+		}
+		for (int neighbor : adj[id1]) { 
+			Vector2 dir = Vector2Subtract(nodes[neighbor].position, p1.position); 
+			float dist = Vector2Length(dir); 
+			float force = dist * springStrength;
+			totalForce = Vector2Add(totalForce, Vector2Scale(Vector2Normalize(dir), force)); 
+		}
+		p1.velocity = Vector2Scale(Vector2Add(p1.velocity, totalForce), damping); 
+		p1.position = Vector2Add(p1.position, Vector2Scale(p1.velocity, deltaTime)); 
+	}
+	
+
+	for (auto const& [u, neighbors] : adj) { 
+		for (int v : neighbors) { 
+			Vector2 delta = Vector2Subtract(nodes[v].position, nodes[u].position);
+			float distance = Vector2Length(delta); 
+
+			float restLength = 100.0f; 
+			float strength = 0.05f;
+			float force = (distance - restLength) * strength; 
+
+			Vector2 attraction = Vector2Scale(Vector2Normalize(delta), force); 
+
+			nodes[u].velocity = Vector2Add(nodes[u].velocity, attraction); 
+			nodes[v].velocity = Vector2Subtract(nodes[v].velocity, attraction); 
+		}
+	}
+}
+
+void Graph::draw() { 
+	for (auto const& [u, neighbors] : adj) { 
+		Vector2 startPos = nodes[u].position; 
+
+		for (int v : neighbors) { 
+			Vector2 endPos = nodes[v].position; 
+			DrawLineEx(startPos, endPos, 2.0f, DARKGRAY); 
+		} 
+	}
+
+	for (auto const& [id, prop] : nodes) { 
+		DrawCircleV(prop.position, 22.0f, BLACK); 
+		DrawCircleV(prop.position, 20.0f, MAROON); 
+
+		std::string label = std::to_string(id); 
+		DrawText(label.c_str(), prop.position.x - 8, prop.position.y - 8, 20, WHITE); 
+	} 
+} 
+
 
