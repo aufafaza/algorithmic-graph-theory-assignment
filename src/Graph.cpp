@@ -6,6 +6,7 @@
 #include <stack> 
 #include <chrono>
 #include <thread> 
+#include <string>
 Graph::Graph(size_t initial_nodes) : adj() {
 	if (initial_nodes > 0) {
 		adj.reserve(initial_nodes);

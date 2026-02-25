@@ -1,4 +1,5 @@
 #include "include/Graph.hpp"
+#include "include/Islands.hpp"
 #include <iostream>
 #include <thread>
 #include <raylib.h>
@@ -8,7 +9,7 @@ void CLI_Interface(Graph& g) {
     while (true) {
         std::cout << "\n--- Graph Menu ---\n";
         std::cout << "1. Add Edge (u v)\n2. Add Vertex (u)\n3. Visual BFS (start)\n4. Visual DFS (start)\n";
-        std::cout << "5. Path Check (u v)\n6. Component Analysis\n7. Reset Colors\n0. Exit\nChoice: ";
+        std::cout << "5. Path Check (u v)\n6. Component Analysis\n7. Reset Colors\n8. Find Islands\n0. Exit\nChoice: ";
         
         if (!(std::cin >> s) || s == 0) break;
 
@@ -38,6 +39,9 @@ void CLI_Interface(Graph& g) {
                 g.component();
                 break;
             case 7:
+                break;
+            case 8:
+                island();
                 break;
             default:
                 std::cout << "Invalid command.\n";
