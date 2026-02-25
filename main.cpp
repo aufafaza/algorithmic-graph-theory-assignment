@@ -3,8 +3,40 @@
 #include <iostream>
 #include <thread>
 #include <raylib.h>
+#include <fstream>
 
-void CLI_Interface(Graph& g) {
+void CLI_Interface(Graph& g, const std::string& filename) {
+
+    if (!filename.empty()) {
+        std::string filepath = "./tests/"+ filename;
+        std::ifstream file(filepath);
+        if (!file.is_open()) {
+            std::cout << "Failed to open file: " << filename << "\n";
+        } else {
+
+            int cmd, u, v;
+
+            while (file >> cmd) {
+                switch (cmd) {
+                    case 1: 
+                        if (file >> u >> v)
+                            g.addEdge(u, v);
+                        break;
+
+                    case 2: 
+                        if (file >> u)
+                            g.addVertex(u);
+                        break;
+
+                    default:
+                        std::cout << "Unknown command in file.\n";
+                }
+            }
+
+            std::cout << "Graph loaded from file: " << filename << "\n";
+        }
+    }
+
     int s, u, v;
     while (true) {
         std::cout << "\n--- Graph Menu ---\n";
@@ -49,7 +81,7 @@ void CLI_Interface(Graph& g) {
     }
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     const int screenWidth = 800;
     const int screenHeight = 600;
     InitWindow(screenWidth, screenHeight, "Graph Physics Visualizer");
@@ -57,8 +89,15 @@ int main() {
 
     Graph g;
 
-    std::thread inputThread(CLI_Interface, std::ref(g));
-    inputThread.detach(); 
+    std::string filename = (argc == 2) ? argv[1] : "";
+
+    if(argc > 2){
+        std::cout << "Invalid! Run by './GraphSolver' or './GraphSolver graph.txt'";
+        return 0;
+    }
+
+    std::thread inputThread(CLI_Interface, std::ref(g), filename);
+    inputThread.detach();
 
     while (!WindowShouldClose()) {
         g.updatePhysics(GetFrameTime());
