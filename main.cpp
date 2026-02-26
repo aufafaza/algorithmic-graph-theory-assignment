@@ -101,7 +101,6 @@ int main(int argc, char* argv[]) {
 
     while (!WindowShouldClose()) {
         g.updatePhysics(GetFrameTime());
-
         BeginDrawing();
             ClearBackground(RAYWHITE);
             
@@ -110,8 +109,7 @@ int main(int argc, char* argv[]) {
             DrawRectangle(10, 10, 320, 60, Fade(SKYBLUE, 0.5f));
             DrawText("Interact via Terminal", 20, 20, 20, DARKBLUE);
             DrawText("Nodes repel, Edges pull (Springs)", 20, 45, 15, BLACK);
-            
-            DrawFPS(720, 10);
+	    DrawFPS(720, 10);
         EndDrawing();
     }
 

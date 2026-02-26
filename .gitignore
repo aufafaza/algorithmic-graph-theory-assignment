@@ -12,3 +12,4 @@ compile_commands.json
 
 *.cmake
 _deps/
+*.txt

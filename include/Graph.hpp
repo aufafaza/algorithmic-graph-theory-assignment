@@ -33,7 +33,7 @@ private:
 	// data member 
 	std::unordered_map<int, std::vector<int>> adj; 
 	std::unordered_map<int, NodeProperties> nodes; 
-
+	bool simulationActive = true; 
 	float repulsionStrength = 5000.0f; 
 	float springStrength = 0.1f; 
 	float damping = 0.85f; 
