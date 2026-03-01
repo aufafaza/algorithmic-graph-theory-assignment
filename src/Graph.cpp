@@ -17,11 +17,12 @@ void Graph::addVertex(int u) {
 	if (adj.find(u) == adj.end()) { 
 		adj[u] = std::vector<int>();
 		
-		float rx = 400 + GetRandomValue(-50, 50);
-		float ry = 300 + GetRandomValue(-50, 50);
+		float rx = 400 + GetRandomValue(-100, 100);
+		float ry = 300 + GetRandomValue(-100, 100);
         
 		nodes[u] = { {rx, ry}, {0, 0} };
 	}
+	simulationActive = true;
 
 } 
 
@@ -36,7 +37,8 @@ void Graph::addEdge(int u, int v){
 	} 
 
 	adj[u].push_back(v); 
-	adj[v].push_back(u); 
+	adj[v].push_back(u);
+	simulationActive = true;
 }
 
 std::unordered_map<int, bool> Graph::DFS(int startNode){ 
@@ -127,6 +129,7 @@ void Graph::component() {
 }
 /* Visualizer related code */
 void Graph::updatePhysics(float deltaTime){ 
+	if (!simulationActive) return; 	
 	for (auto& [id1, p1] : nodes) { 
 		Vector2 totalForce = {0, 0}; 
 		for (auto& [id2, p2] : nodes) {
@@ -135,33 +138,55 @@ void Graph::updatePhysics(float deltaTime){
 			Vector2 dir = Vector2Subtract(p1.position, p2.position);
 			float distSq = Vector2LengthSqr(dir) + 0.1f; 
 			float force = repulsionStrength / distSq; 
-			totalForce = Vector2Add(totalForce, Vector2Scale(Vector2Normalize(dir), force)); 
+			totalForce = Vector2Multiply(totalForce, Vector2Scale(Vector2Normalize(dir), force)); 
 		}
-		for (int neighbor : adj[id1]) { 
-			Vector2 dir = Vector2Subtract(nodes[neighbor].position, p1.position); 
-			float dist = Vector2Length(dir); 
-			float force = dist * springStrength;
-			totalForce = Vector2Add(totalForce, Vector2Scale(Vector2Normalize(dir), force)); 
-		}
-		p1.velocity = Vector2Scale(Vector2Add(p1.velocity, totalForce), damping); 
-		p1.position = Vector2Add(p1.position, Vector2Scale(p1.velocity, deltaTime)); 
-	}
 	
+		p1.velocity = Vector2Add(p1.velocity, Vector2Scale(totalForce, deltaTime));
+	}
+	float restLength = 100.0f; 
+	for (auto const& [u, neighbors] : adj)
+	{
+		for (int v : neighbors)
+		{
+		    Vector2 delta = Vector2Subtract(
+			nodes[v].position,
+			nodes[u].position
+		    );
 
-	for (auto const& [u, neighbors] : adj) { 
-		for (int v : neighbors) { 
-			Vector2 delta = Vector2Subtract(nodes[v].position, nodes[u].position);
-			float distance = Vector2Length(delta); 
+		    float distance = Vector2Length(delta);
+		    if (distance < 0.001f) continue;
 
-			float restLength = 100.0f; 
-			float strength = 0.05f;
-			float force = (distance - restLength) * strength; 
+		    float force = (distance - restLength) * springStrength * 2;
 
-			Vector2 attraction = Vector2Scale(Vector2Normalize(delta), force); 
+		    Vector2 attraction = Vector2Scale(
+			Vector2Normalize(delta),
+			force
+		    );
 
-			nodes[u].velocity = Vector2Add(nodes[u].velocity, attraction); 
-			nodes[v].velocity = Vector2Subtract(nodes[v].velocity, attraction); 
+		    nodes[u].velocity = Vector2Add(
+			nodes[u].velocity,
+			Vector2Scale(attraction, deltaTime)
+		    );
+
+		    nodes[v].velocity = Vector2Subtract(
+			nodes[v].velocity,
+			Vector2Scale(attraction, deltaTime)
+		    );
 		}
+	    }
+	float totalMovement = 0.0f; 
+	for (auto& [id, p] : nodes) { 
+		p.velocity = Vector2Scale(p.velocity, damping); 
+
+		if (Vector2Length(p.velocity) < 0.01f){ 
+			p.velocity = {0, 0};
+		} 
+
+		p.position = Vector2Add(p.position, Vector2Scale(p.velocity, deltaTime));
+		totalMovement += Vector2Length(p.velocity);
+	}
+	if (totalMovement < 0.001f){ 
+		simulationActive = false;
 	}
 }
 
