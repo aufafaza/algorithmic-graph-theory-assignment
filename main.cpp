@@ -41,7 +41,7 @@ void CLI_Interface(Graph& g, const std::string& filename) {
     while (true) {
         std::cout << "\n--- Graph Menu ---\n";
         std::cout << "1. Add Edge (u v)\n2. Add Vertex (u)\n3. Visual BFS (start)\n4. Visual DFS (start)\n";
-        std::cout << "5. Path Check (u v)\n6. Component Analysis\n7. Reset Colors\n8. Find Islands\n0. Exit\nChoice: ";
+        std::cout << "5. Path Check (u v)\n6. Component Analysis\n7. Reset / Back to Graph\n8. Find Islands\n0. Exit\nChoice: ";
         
         if (!(std::cin >> s) || s == 0) break;
 
@@ -71,6 +71,8 @@ void CLI_Interface(Graph& g, const std::string& filename) {
                 g.component();
                 break;
             case 7:
+                g.resetColors();
+                currentRenderMode = GRAPH_MODE;
                 break;
             case 8:
                 island();
@@ -100,19 +102,28 @@ int main(int argc, char* argv[]) {
     inputThread.detach();
 
     while (!WindowShouldClose()) {
-        g.updatePhysics(GetFrameTime());
 
-        BeginDrawing();
-            ClearBackground(RAYWHITE);
-            
-            g.draw();
-            
-            DrawRectangle(10, 10, 320, 60, Fade(SKYBLUE, 0.5f));
-            DrawText("Interact via Terminal", 20, 20, 20, DARKBLUE);
-            DrawText("Nodes repel, Edges pull (Springs)", 20, 45, 15, BLACK);
-            
-            DrawFPS(720, 10);
-        EndDrawing();
+        if (currentRenderMode == GRAPH_MODE) {
+            // Graph mode 
+            g.updatePhysics(GetFrameTime());
+
+            BeginDrawing();
+                ClearBackground(RAYWHITE);
+                g.draw();
+
+                DrawRectangle(10, 10, 320, 60, Fade(SKYBLUE, 0.5f));
+                DrawText("Interact via Terminal", 20, 20, 20, DARKBLUE);
+                DrawText("Nodes repel, Edges pull (Springs)", 20, 45, 15, BLACK);
+                DrawFPS(720, 10);
+            EndDrawing();
+        } else {
+            // Island grid mode
+            BeginDrawing();
+                ClearBackground(RAYWHITE);
+                g_matrix.draw(screenWidth, screenHeight);
+                DrawFPS(720, 10);
+            EndDrawing();
+        }
     }
 
     CloseWindow();
