@@ -77,7 +77,12 @@ void CLI_Interface(Graph& g, const std::string& filename) {
             case 8:
                 island();
                 break;
-            default:
+	    case 9:
+		std::cout << "put a random node: "; 
+		std::cin >> u; 
+		if (g.hasCycle(u)) std::cout << "exists a cycle\n"; 
+		break;
+	    default:
                 std::cout << "Invalid command.\n";
         }
     }

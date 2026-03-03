@@ -7,6 +7,7 @@
 #include <chrono>
 #include <thread> 
 #include <string>
+#include <unordered_map>
 
 float Graph::VertexDistance = 150.0f;  
 
@@ -139,6 +140,35 @@ void Graph::component() {
     }
     std::cout << "Is Connected: " << (componentCount == 1 ? "Yes" : "No") << std::endl;
 }
+
+
+bool Graph::hasCycle(int start){ 
+	std::unordered_map<int, bool> visited;
+	std::unordered_map<int, int> parent;
+
+	std::stack<int> s;
+	parent[start] = -1; 	
+	 
+
+	s.push(start); 
+	while (!s.empty()){
+		int current = s.top(); 
+		s.pop(); 
+		
+		if (visited.find(current) == visited.end()){ 
+			visited[current] = true;
+			for (int neighbor : adj[current]){
+				if (visited.find(neighbor) == visited.end()){
+					s.push(neighbor);
+					parent[neighbor] = current;	
+				}else if (neighbor != parent[current]){
+					return true; 
+				}
+			}
+		}
+	}
+	return false; 
+} 
 
 
 
