@@ -29,6 +29,7 @@ public:
 	void visualBFS(int startNode);
 	void visualDFS(int startNode);
 	void resetColors();
+	static float VertexDistance; 
 private: 
 	// data member 
 	std::unordered_map<int, std::vector<int>> adj; 

@@ -7,6 +7,9 @@
 #include <chrono>
 #include <thread> 
 #include <string>
+
+float Graph::VertexDistance = 150.0f;  
+
 Graph::Graph(size_t initial_nodes) : adj() {
 	if (initial_nodes > 0) {
 		adj.reserve(initial_nodes);
@@ -16,15 +19,24 @@ Graph::Graph(size_t initial_nodes) : adj() {
 void Graph::addVertex(int u) { 
 	if (adj.find(u) == adj.end()) { 
 		adj[u] = std::vector<int>();
-		
-		float rx = 400 + GetRandomValue(-100, 100);
-		float ry = 300 + GetRandomValue(-100, 100);
-        
-		nodes[u] = { {rx, ry}, {0, 0} };
-	}
+
+		Vector2 pos = { 400.0f, 300.0f }; 
+			
+       		if (!nodes.empty()){ 
+			auto it = nodes.begin(); 
+			std::advance(it, GetRandomValue(0, nodes.size() -1)); 
+
+			Vector2 parentpos = it->second.position; 
+
+			float angle = (static_cast<float>(GetRandomValue(0, 360) * (PI/180.0f)));
+			pos.x = parentpos.x + cosf(angle) * VertexDistance;
+			pos.y = parentpos.x + sinf(angle) * VertexDistance;
+		}
+		nodes[u] = { pos, {0, 0}, MAROON }; 
+	} 
 	simulationActive = true;
 
-} 
+}
 
 void Graph::addEdge(int u, int v){
 	// check whether vertex exists or not yet 
@@ -130,6 +142,10 @@ void Graph::component() {
 /* Visualizer related code */
 void Graph::updatePhysics(float deltaTime){ 
 	if (!simulationActive) return; 	
+	float screenWidth = 800.0f; 
+	float screenHeight = 600.0f; 
+
+	float padding = 25.0f; 
 	for (auto& [id1, p1] : nodes) { 
 		Vector2 totalForce = {0, 0}; 
 		for (auto& [id2, p2] : nodes) {
@@ -180,7 +196,25 @@ void Graph::updatePhysics(float deltaTime){
 
 		if (Vector2Length(p.velocity) < 0.01f){ 
 			p.velocity = {0, 0};
-		} 
+		}
+
+		p.position = Vector2Add(p.position, Vector2Scale(p.velocity, deltaTime));
+
+		if (p.position.x < padding) {
+			    p.position.x = padding;
+			    p.velocity.x *= -0.2f; 
+		} else if (p.position.x > screenWidth - padding) {
+			    p.position.x = screenWidth - padding;
+			    p.velocity.x *= -0.2f;
+		}
+
+		if (p.position.y < padding) {
+		    p.position.y = padding;
+		    p.velocity.y *= -0.2f;
+		} else if (p.position.y > screenHeight - padding) {
+		    p.position.y = screenHeight - padding;
+		    p.velocity.y *= -0.2f;
+		}
 
 		p.position = Vector2Add(p.position, Vector2Scale(p.velocity, deltaTime));
 		totalMovement += Vector2Length(p.velocity);
