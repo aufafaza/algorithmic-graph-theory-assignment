@@ -149,7 +149,8 @@ bool Graph::hasCycle(int start){
 	std::stack<int> s;
 	parent[start] = -1; 	
 	 
-
+	int cycleEnd = -1;
+	int cycleStart = -1; 
 	s.push(start); 
 	while (!s.empty()){
 		int current = s.top(); 
@@ -160,13 +161,28 @@ bool Graph::hasCycle(int start){
 			for (int neighbor : adj[current]){
 				if (visited.find(neighbor) == visited.end()){
 					s.push(neighbor);
-					parent[neighbor] = current;	
+					parent[neighbor] = current;
+					
 				}else if (neighbor != parent[current]){
-					return true; 
-				}
+					cycleStart = current; 
+					cycleEnd = neighbor;  
+					break; 
+				}	
 			}
 		}
 	}
+
+	if (cycleEnd != -1) { 
+		nodes[cycleStart].color = GREEN; 
+		int tracer = cycleEnd; 
+		while (tracer != -1 && tracer != cycleStart){
+			nodes[tracer].color = GREEN;
+			tracer = parent[tracer];
+		}
+		simulationActive = true; 
+		return true; 
+	}
+
 	return false; 
 } 
 
