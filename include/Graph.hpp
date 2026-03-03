@@ -13,7 +13,6 @@ struct NodeProperties {
 }; 
 
 class Graph { 
-	// adjacency matrix to store edges 
 public: 
 	Graph(size_t initial_nodes = 0); 
 	void addEdge(int u, int v); 
@@ -21,9 +20,9 @@ public:
 	std::unordered_map<int, bool> BFS(int startNode); 
 	std::unordered_map<int, bool>  DFS(int startNode);
 	bool hasPath(int start, int target); 
-	void component(); 
-	// visualizer 
-	void printGraph(); 
+	void component();
+	bool hasCycle();
+
 	void updatePhysics(float deltaTime); 
 	void draw();
 	void visualBFS(int startNode);

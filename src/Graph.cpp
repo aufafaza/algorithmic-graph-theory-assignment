@@ -139,6 +139,9 @@ void Graph::component() {
     }
     std::cout << "Is Connected: " << (componentCount == 1 ? "Yes" : "No") << std::endl;
 }
+
+
+
 /* Visualizer related code */
 void Graph::updatePhysics(float deltaTime){ 
 	if (!simulationActive) return; 	
