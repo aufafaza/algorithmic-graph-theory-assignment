@@ -279,14 +279,15 @@ void Graph::draw() {
 void Graph::resetColors() { 
 	for (auto& [id, prop] : nodes) { 
 		prop.color = MAROON; 
-	} 
+	}
+	simulationActive = true;
 } 
 
 void Graph::visualBFS(int startNode) {
 	resetColors(); 
 	auto visitedMap = BFS(startNode);
     for (auto const& [id, _] : visitedMap) {
-        nodes[id].color = GREEN; // Highlight visited nodes
+        nodes[id].color = GREEN; 
     }
 }
 
