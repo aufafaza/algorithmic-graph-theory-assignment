@@ -21,7 +21,7 @@ public:
 	std::unordered_map<int, bool>  DFS(int startNode);
 	bool hasPath(int start, int target); 
 	void component();
-	bool hasCycle(int start);
+	int hasCycle(int start);
 
 	void updatePhysics(float deltaTime); 
 	void draw();

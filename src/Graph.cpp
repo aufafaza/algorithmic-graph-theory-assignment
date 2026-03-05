@@ -133,16 +133,20 @@ void Graph::component() {
         }
     }
 
-    // Output Results
     std::cout << "Number of components: " << componentCount << std::endl;
-    for (int i = 0; i < componentSizes.size(); i++) {
-        std::cout << "Component " << i + 1 << " size: " << componentSizes[i] << std::endl;
+    int max = componentSizes[0];
+    for (int i = 1; i < componentSizes.size(); i++) {
+		if (max < componentSizes[i]){
+			max = componentSizes[i];
+		}
+	    std::cout << "Component " << i + 1 << " size: " << componentSizes[i] << std::endl;
     }
     std::cout << "Is Connected: " << (componentCount == 1 ? "Yes" : "No") << std::endl;
+	std::cout << "Largest: " << (componentCount > 0 ? max : 0) << std::endl;
 }
 
 
-bool Graph::hasCycle(int start){ 
+int Graph::hasCycle(int start){ 
 	std::unordered_map<int, bool> visited;
 	std::unordered_map<int, int> parent;
 
@@ -151,7 +155,8 @@ bool Graph::hasCycle(int start){
 	 
 	int cycleEnd = -1;
 	int cycleStart = -1; 
-	s.push(start); 
+	s.push(start);
+	int i = 0;
 	while (!s.empty()){
 		int current = s.top(); 
 		s.pop(); 
@@ -164,27 +169,22 @@ bool Graph::hasCycle(int start){
 					parent[neighbor] = current;
 					
 				}else if (neighbor != parent[current]){
-					cycleStart = current; 
-					cycleEnd = neighbor;  
-					break; 
+					for (const auto& [key, val] : parent){ 
+						cout << "parent of " << key << ": " << val << endl;
+					}
+					i++; 
+					cout << "counter: " << i << endl; 
+					cout << "Cycle detected aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" << endl;	
 				}	
 			}
 		}
 	}
 
-	if (cycleEnd != -1) { 
-		nodes[cycleStart].color = GREEN; 
-		int tracer = cycleEnd; 
-		while (tracer != -1 && tracer != cycleStart){
-			nodes[tracer].color = GREEN;
-			tracer = parent[tracer];
-		}
-		simulationActive = true; 
-		return true; 
-	}
 
-	return false; 
-} 
+	return i; 
+}
+
+
 
 
 
@@ -205,8 +205,6 @@ void Graph::updatePhysics(float deltaTime){
 			float force = repulsionStrength / distSq; 
 			totalForce = Vector2Multiply(totalForce, Vector2Scale(Vector2Normalize(dir), force)); 
 		}
-	
-		p1.velocity = Vector2Add(p1.velocity, Vector2Scale(totalForce, deltaTime));
 	}
 	float restLength = 100.0f; 
 	for (auto const& [u, neighbors] : adj)
@@ -219,7 +217,7 @@ void Graph::updatePhysics(float deltaTime){
 		    );
 
 		    float distance = Vector2Length(delta);
-		    if (distance < 0.001f) continue;
+		    // if (distance < 0.001f) continue;
 
 		    float force = (distance - restLength) * springStrength * 2;
 
@@ -268,7 +266,7 @@ void Graph::updatePhysics(float deltaTime){
 		p.position = Vector2Add(p.position, Vector2Scale(p.velocity, deltaTime));
 		totalMovement += Vector2Length(p.velocity);
 	}
-	if (totalMovement < 0.001f){ 
+	if (totalMovement < 0.01f){ 
 		simulationActive = false;
 	}
 }
@@ -279,7 +277,7 @@ void Graph::draw() {
 
 		for (int v : neighbors) { 
 			Vector2 endPos = nodes[v].position; 
-			DrawLineEx(startPos, endPos, 2.0f, DARKGRAY); 
+			DrawLineEx(startPos, endPos, 4.0f, BLUE); 
 		} 
 	}
 
